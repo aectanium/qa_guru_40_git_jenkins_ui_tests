@@ -14,10 +14,11 @@ public class RegistrationTests {
     @BeforeAll
     static void beforeAll() {
         Configuration.browserSize = "1920x1080";
-        Configuration.browser = "chrome";
-        Configuration.browserVersion = "144";
+        //Configuration.browser = "chrome";
+        //Configuration.browserVersion = "128";
         Configuration.baseUrl = "https://demoqa.com";
         Configuration.pageLoadStrategy = "eager";
+        Configuration.remote = "https://user1:1234@selenoid.autotests.cloud/wd/hub";
     }
 
     @Test
