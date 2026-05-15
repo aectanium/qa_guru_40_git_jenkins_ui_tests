@@ -1,11 +1,14 @@
 package tests;
-
+import helpers.Attach;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import io.qameta.allure.selenide.AllureSelenide;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import pages.RegistrationPage;
+
+import static com.codeborne.selenide.Selenide.closeWebDriver;
 
 public class TestBase {
 
@@ -25,5 +28,12 @@ public class TestBase {
 //        Configuration.browserVersion = "130.0";
         Configuration.remote = "https://user1:1234@ru.selenoid.autotests.cloud/wd/hub";
     }
-
+    @AfterEach
+    void addAttachments() {
+        Attach.screenshots();
+        Attach.pageSource();
+        Attach.browserConsoleLogs();
+        Attach.addVideo();
+        closeWebDriver();
+    }
 }
