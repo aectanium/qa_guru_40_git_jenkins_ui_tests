@@ -24,23 +24,35 @@ public class TestBase {
 
     @BeforeAll
     static void setupSelenideConfig() {
+
         Configuration.browser = System.getProperty("browser", "chrome");
-        Configuration.browserVersion = System.getProperty("browserVersion", "144.0");
+        Configuration.browserVersion = System.getProperty("browserVersion", "126.0");
         Configuration.browserSize = System.getProperty("browserSize", "1920x1080");
         Configuration.baseUrl = System.getProperty("baseUrl", "https://demoqa.com");
         Configuration.pageLoadStrategy = "eager";
-        Configuration.headless = Boolean.parseBoolean(System.getProperty("headless", "false"));
+        Configuration.headless = Boolean.parseBoolean(System.getProperty("headless", "true"));
 
+        String environment = System.getProperty("environment", "demo");
+        String remoteUrl = System.getProperty("remoteUrl");
 
-        String remoteUrl = System.getProperty("remote");
+        System.out.println("Environment: " + environment);
+        System.out.println("Browser: " + Configuration.browser + " " + Configuration.browserVersion);
+        System.out.println("Headless: " + Configuration.headless);
+
         if (remoteUrl != null && !remoteUrl.isEmpty()) {
             System.out.println("Using remote WebDriver: " + remoteUrl);
 
             DesiredCapabilities capabilities = new DesiredCapabilities();
-            capabilities.setCapability("selenoid:options", Map.<String, Object>of(
+
+            boolean enableVideo = Boolean.parseBoolean(System.getProperty("enableVideo", "false"));
+            Map<String, Object> selenoidOptions = Map.<String, Object>of(
                     "enableVNC", true,
-                    "enableVideo", true
-            ));
+                    "enableVideo", enableVideo,
+                    "name", "UI Tests - " + environment,
+                    "build", System.getProperty("buildVersion", "local")
+            );
+
+            capabilities.setCapability("selenoid:options", selenoidOptions);
             Configuration.browserCapabilities = capabilities;
             Configuration.remote = remoteUrl;
         } else {
