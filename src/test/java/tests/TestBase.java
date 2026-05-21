@@ -31,17 +31,21 @@ public class TestBase {
         Configuration.pageLoadStrategy = "eager";
         Configuration.headless = Boolean.parseBoolean(System.getProperty("headless", "false"));
 
-        String loginSelenoid = System.getProperty("loginSelenoid", "user1");
-        String passwordSelenoid = System.getProperty("passwordSelenoid", "1234");
-        String urlSelenoid = System.getProperty("urlSelenoid", "selenoid.autotests.cloud/wd/hub");
 
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setCapability("selenoid:options", Map.<String, Object>of(
-                "enableVNC", true,
-                "enableVideo", true
-        ));
-        Configuration.browserCapabilities = capabilities;
-        Configuration.remote = "https://" + loginSelenoid + ":" + passwordSelenoid + "@" + urlSelenoid;
+        String remoteUrl = System.getProperty("remote");
+        if (remoteUrl != null && !remoteUrl.isEmpty()) {
+            System.out.println("Using remote WebDriver: " + remoteUrl);
+
+            DesiredCapabilities capabilities = new DesiredCapabilities();
+            capabilities.setCapability("selenoid:options", Map.<String, Object>of(
+                    "enableVNC", true,
+                    "enableVideo", true
+            ));
+            Configuration.browserCapabilities = capabilities;
+            Configuration.remote = remoteUrl;
+        } else {
+            System.out.println("Using local WebDriver");
+        }
     }
 
     @AfterEach
