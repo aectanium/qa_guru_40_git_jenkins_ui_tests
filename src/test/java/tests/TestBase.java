@@ -1,4 +1,5 @@
 package tests;
+
 import helpers.Attach;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.logevents.SelenideLogger;
@@ -24,16 +25,36 @@ public class TestBase {
 
     @BeforeAll
     static void beforeAll() {
-        Configuration.baseUrl = "https://demoqa.com";
-        Configuration.browserSize = "1920x1080";
+        // Базовый URL
+        Configuration.baseUrl = System.getProperty("baseUrl", "https://demoqa.com");
+
+        // Браузер и версия
+        String browser = System.getProperty("browser", "chrome");
+        String browserVersion = System.getProperty("browserVersion", "100.0");
+        Configuration.browser = browser;
+        Configuration.browserVersion = browserVersion;
+
+        // Размер экрана
+        Configuration.browserSize = System.getProperty("browserSize", "1920x1080");
+
+        // Headless режим
+        Configuration.headless = Boolean.parseBoolean(System.getProperty("headless", "false"));
+
+        // Remote Selenoid
+        String remote = System.getProperty("remote", "");
+        if (remote != null && !remote.isEmpty()) {
+            Configuration.remote = remote;
+        }
+
+        // Настройки Selenoid
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("selenoid:options", Map.<String, Object>of(
                 "enableVNC", true,
                 "enableVideo", true
         ));
         Configuration.browserCapabilities = capabilities;
-        Configuration.remote = "https://user1:1234@selenoid.autotests.cloud/wd/hub";
     }
+
     @AfterEach
     void addAttachments() {
         Attach.screenshotAs();
