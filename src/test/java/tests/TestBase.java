@@ -25,15 +25,15 @@ public class TestBase {
     @BeforeAll
     static void setupSelenideConfig() {
         Configuration.browser = System.getProperty("browser", "chrome");
-        Configuration.browserVersion = System.getProperty("browserVersion", "127.0");
+        Configuration.browserVersion = System.getProperty("browserVersion", "144.0");
         Configuration.browserSize = System.getProperty("browserSize", "1920x1080");
-        Configuration.baseUrl = System.getProperty("baseUrl");
+        Configuration.baseUrl = System.getProperty("baseUrl", "https://demoqa.com");
         Configuration.pageLoadStrategy = "eager";
         Configuration.headless = Boolean.parseBoolean(System.getProperty("headless", "false"));
 
-        String loginSelenoid = System.getProperty("loginSelenoid");
-        String passwordSelenoid = System.getProperty("passwordSelenoid");
-        String urlSelenoid = System.getProperty("urlSelenoid");
+        String loginSelenoid = System.getProperty("loginSelenoid", "user1");
+        String passwordSelenoid = System.getProperty("passwordSelenoid", "1234");
+        String urlSelenoid = System.getProperty("urlSelenoid", "selenoid.autotests.cloud/wd/hub");
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("selenoid:options", Map.<String, Object>of(
@@ -43,6 +43,7 @@ public class TestBase {
         Configuration.browserCapabilities = capabilities;
         Configuration.remote = "https://" + loginSelenoid + ":" + passwordSelenoid + "@" + urlSelenoid;
     }
+
     @AfterEach
     void addAttachments() {
         Attach.screenshotAs();
