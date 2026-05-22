@@ -30,7 +30,7 @@ public class TestBase {
     static void setupSelenideConfig() {
 
         Configuration.browser = System.getProperty("browser", "chrome");
-        Configuration.browserVersion = System.getProperty("browserVersion", "128.0");
+        Configuration.browserVersion = System.getProperty("browserVersion", "126.0");
         Configuration.browserSize = System.getProperty("browserSize", "1920x1080");
         Configuration.baseUrl = System.getProperty("baseUrl", "https://demoqa.com");
         Configuration.pageLoadStrategy = "eager";
@@ -66,35 +66,64 @@ public class TestBase {
 
     @AfterEach
     void addAttachments() {
+        System.out.println("=== @AfterEach started ===");
         try {
+            System.out.println("Taking screenshot...");
             Attach.screenshotAs();
+            System.out.println("Screenshot taken");
+
+            System.out.println("Getting page source...");
             Attach.pageSource();
+            System.out.println("Page source taken");
+
+            System.out.println("Getting browser console logs...");
             Attach.browserConsoleLogs();
+            System.out.println("Browser logs taken");
+
             if (Boolean.parseBoolean(System.getProperty("enableVideo", "false"))) {
+                System.out.println("Adding video...");
                 Attach.addVideo();
+                System.out.println("Video added");
             }
         } catch (Exception e) {
             System.err.println("Error during attachment: " + e.getMessage());
+            e.printStackTrace();
         } finally {
+            System.out.println("Closing WebDriver...");
             closeWebDriver();
+            System.out.println("=== @AfterEach finished ===");
         }
     }
 
     static class FailureHandler implements TestExecutionExceptionHandler {
         @Override
         public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
+            System.out.println("=== FailureHandler started - Test Failed! ===");
 
             try {
+                System.out.println("Failure: Taking screenshot...");
                 Attach.screenshotAs();
+                System.out.println("Failure: Screenshot taken");
+
+                System.out.println("Failure: Getting page source...");
                 Attach.pageSource();
+                System.out.println("Failure: Page source taken");
+
+                System.out.println("Failure: Getting browser console logs...");
                 Attach.browserConsoleLogs();
+                System.out.println("Failure: Browser logs taken");
+
                 if (Boolean.parseBoolean(System.getProperty("enableVideo", "false"))) {
+                    System.out.println("Failure: Adding video...");
                     Attach.addVideo();
+                    System.out.println("Failure: Video added");
                 }
             } catch (Exception e) {
                 System.err.println("Error during attachment on failure: " + e.getMessage());
+                e.printStackTrace();
             }
 
+            System.out.println("=== FailureHandler finished - Re-throwing exception ===");
 
             throw throwable;
         }
