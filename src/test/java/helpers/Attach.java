@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import static com.codeborne.selenide.Selenide.sessionId;
 import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
 import static org.openqa.selenium.logging.LogType.BROWSER;
+import org.openqa.selenium.logging.LogEntries;
 
 public class Attach {
     @Attachment(value = "Last screenshot", type = "image/png")
@@ -30,10 +31,15 @@ public class Attach {
     }
 
     public static void browserConsoleLogs() {
-        attachAsText(
-                "Browser console logs",
-                String.join("\n", Selenide.getWebDriverLogs(BROWSER))
-        );
+        try {
+            LogEntries logEntries = getWebDriver().manage().logs().get(BROWSER);
+            attachAsText(
+                    "Browser console logs",
+                    String.join("\n", logEntries.getAll().stream().map(Object::toString).toList())
+            );
+        } catch (Exception e) {
+            attachAsText("Browser console logs", "No logs available: " + e.getMessage());
+        }
     }
 
     @Attachment(value = "Video", type = "text/html", fileExtension = ".html")
