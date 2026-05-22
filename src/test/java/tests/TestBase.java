@@ -20,6 +20,10 @@ public class TestBase {
 
     RegistrationPage registrationPage = new RegistrationPage();
 
+    static {
+        System.out.println("=== TestBase class loaded ===");
+    }
+
     @BeforeEach
     void addListener() {
         System.out.println("=== @BeforeEach started ===");
@@ -29,6 +33,7 @@ public class TestBase {
 
     @BeforeAll
     static void setupSelenideConfig() {
+        System.out.println("=== @BeforeAll started ===");
 
         Configuration.browser = System.getProperty("browser", "chrome");
         Configuration.browserVersion = System.getProperty("browserVersion", "128.0");
