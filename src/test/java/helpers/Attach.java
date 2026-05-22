@@ -1,10 +1,12 @@
 package helpers;
 
 import com.codeborne.selenide.Selenide;
+import io.qameta.allure.Allure;
 import io.qameta.allure.Attachment;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
+import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -15,19 +17,18 @@ import static org.openqa.selenium.logging.LogType.BROWSER;
 import org.openqa.selenium.logging.LogEntries;
 
 public class Attach {
-    @Attachment(value = "Last screenshot", type = "image/png")
-    public static byte[] screenshotAs() {
-        return ((TakesScreenshot) getWebDriver()).getScreenshotAs(OutputType.BYTES);
+    public static void screenshotAs() {
+        byte[] screenshot = ((TakesScreenshot) getWebDriver()).getScreenshotAs(OutputType.BYTES);
+        Allure.addAttachment("Last screenshot", "image/png", new java.io.ByteArrayInputStream(screenshot), "png");
     }
 
-    @Attachment(value = "Page source", type = "text/plain")
-    public static byte[] pageSource() {
-        return getWebDriver().getPageSource().getBytes(StandardCharsets.UTF_8);
+    public static void pageSource() {
+        String pageSource = getWebDriver().getPageSource();
+        Allure.addAttachment("Page source", "text/plain", pageSource, ".txt");
     }
 
-    @Attachment(value = "{attachName}", type = "text/plain")
-    public static String attachAsText(String attachName, String message) {
-        return message;
+    public static void attachAsText(String attachName, String message) {
+        Allure.addAttachment(attachName, "text/plain", message, ".txt");
     }
 
     public static void browserConsoleLogs() {
@@ -42,11 +43,11 @@ public class Attach {
         }
     }
 
-    @Attachment(value = "Video", type = "text/html", fileExtension = ".html")
-    public static String addVideo() {
-        return "<html><body><video width='100%' height='100%' controls autoplay><source src='"
+    public static void addVideo() {
+        String videoHtml = "<html><body><video width='100%' height='100%' controls autoplay><source src='"
                 + getVideoUrl()
                 + "' type='video/mp4'></video></body></html>";
+        Allure.addAttachment("Video", "text/html", videoHtml, ".html");
     }
 
     public static URL getVideoUrl() {
