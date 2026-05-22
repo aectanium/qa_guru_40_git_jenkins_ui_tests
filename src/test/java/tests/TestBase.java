@@ -6,6 +6,7 @@ import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -21,7 +22,9 @@ public class TestBase {
 
     @BeforeEach
     void addListener() {
+        System.out.println("=== @BeforeEach started ===");
         SelenideLogger.addListener("AllureSelenide", new AllureSelenide());
+        System.out.println("=== @BeforeEach finished ===");
     }
 
     @BeforeAll
@@ -97,7 +100,7 @@ public class TestBase {
         @Override
         public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
             System.out.println("=== FailureHandler started - Test Failed! ===");
-
+            // Добавляем аттачи при падении теста
             try {
                 System.out.println("Failure: Taking screenshot...");
                 Attach.screenshotAs();
@@ -122,7 +125,7 @@ public class TestBase {
             }
 
             System.out.println("=== FailureHandler finished - Re-throwing exception ===");
-
+            // Пробрасываем исключение дальше
             throw throwable;
         }
     }
