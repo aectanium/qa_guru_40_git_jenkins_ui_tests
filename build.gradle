@@ -2,20 +2,19 @@ plugins {
     id 'java'
     id 'io.qameta.allure' version "2.11.2"
 }
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
-group = 'guru.qa'
-version = '1.0-SNAPSHOT'
 
 allure {
-    report { // секция репорта
+    report {
         version.set("2.19.0")
     }
     adapter {
-        aspectjWeaver.set(true)
+        aspectjWeaver.set(false)  // Отключено для Java 21
         frameworks {
             junit5 {
                 adapterVersion.set("2.19.0")
