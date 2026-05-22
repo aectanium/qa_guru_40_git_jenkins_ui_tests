@@ -6,7 +6,6 @@ import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -16,7 +15,6 @@ import java.util.Map;
 
 import static com.codeborne.selenide.Selenide.closeWebDriver;
 
-@ExtendWith(TestBase.FailureHandler.class)
 public class TestBase {
 
     RegistrationPage registrationPage = new RegistrationPage();
