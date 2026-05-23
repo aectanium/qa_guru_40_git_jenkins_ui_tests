@@ -5,26 +5,46 @@ import io.qameta.allure.Allure;
 import io.qameta.allure.Attachment;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.logging.LogEntries;
 
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
-import static com.codeborne.selenide.Selenide.sessionId;
 import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
 import static org.openqa.selenium.logging.LogType.BROWSER;
-import org.openqa.selenium.logging.LogEntries;
 
 public class Attach {
+
+    public static String getSessionId() {
+        try {
+            WebDriver driver = getWebDriver();
+            if (driver != null) {
+                return ((org.openqa.selenium.remote.RemoteWebDriver) driver).getSessionId().toString();
+            }
+        } catch (Exception e) {
+            System.err.println("DEBUG: Error getting session ID: " + e.getMessage());
+        }
+        return null;
+    }
+
     public static void screenshotAs() {
-        byte[] screenshot = ((TakesScreenshot) getWebDriver()).getScreenshotAs(OutputType.BYTES);
-        Allure.addAttachment("Last screenshot", "image/png", new java.io.ByteArrayInputStream(screenshot), "png");
+        try {
+            byte[] screenshot = ((TakesScreenshot) getWebDriver()).getScreenshotAs(OutputType.BYTES);
+            Allure.addAttachment("Last screenshot", "image/png", new ByteArrayInputStream(screenshot), "png");
+        } catch (Exception e) {
+            System.err.println("DEBUG: Error taking screenshot: " + e.getMessage());
+        }
     }
 
     public static void pageSource() {
-        String pageSource = getWebDriver().getPageSource();
-        Allure.addAttachment("Page source", "text/plain", pageSource, ".txt");
+        try {
+            String pageSource = getWebDriver().getPageSource();
+            Allure.addAttachment("Page source", "text/plain", pageSource, ".txt");
+        } catch (Exception e) {
+            System.err.println("DEBUG: Error getting page source: " + e.getMessage());
+        }
     }
 
     public static void attachAsText(String attachName, String message) {
@@ -45,17 +65,25 @@ public class Attach {
 
     public static void addVideo() {
         try {
-            String currentSessionId = String.valueOf(sessionId());
+            String currentSessionId = getSessionId();
             if (currentSessionId == null || currentSessionId.isEmpty()) {
                 System.err.println("DEBUG: No session ID available for video");
+                attachAsText("Video Info", "Video not available: No session ID (local run?)");
                 return;
             }
 
-            String videoUrl = getVideoUrl().toString();
-            System.err.println("DEBUG: Video URL: " + videoUrl);
+            URL videoUrl = getVideoUrl(currentSessionId);
+            if (videoUrl == null) {
+                System.err.println("DEBUG: Failed to construct video URL");
+                attachAsText("Video Info", "Video not available: Failed to construct URL");
+                return;
+            }
+
+            String videoUrlString = videoUrl.toString();
+            System.err.println("DEBUG: Video URL: " + videoUrlString);
 
             String videoHtml = "<html><body><video width='100%' height='100%' controls autoplay><source src='"
-                    + videoUrl
+                    + videoUrlString
                     + "' type='video/mp4'></video></body></html>";
 
             Allure.addAttachment("Video", "text/html", videoHtml, ".html");
@@ -63,18 +91,18 @@ public class Attach {
 
         } catch (Exception e) {
             System.err.println("DEBUG: Error adding video: " + e.getMessage());
+            attachAsText("Video Error", "Failed to add video: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    public static URL getVideoUrl() {
-        String currentSessionId = String.valueOf(sessionId());
-        if (currentSessionId == null || currentSessionId.isEmpty()) {
+    public static URL getVideoUrl(String sessionId) {
+        if (sessionId == null || sessionId.isEmpty()) {
             System.err.println("DEBUG: Session ID is null or empty in getVideoUrl");
             return null;
         }
 
-        String videoUrl = "https://selenoid.autotests.cloud/video/" + currentSessionId + ".mp4";
+        String videoUrl = "https://selenoid.autotests.cloud/video/" + sessionId + ".mp4";
         System.err.println("DEBUG: Constructed video URL: " + videoUrl);
 
         try {
