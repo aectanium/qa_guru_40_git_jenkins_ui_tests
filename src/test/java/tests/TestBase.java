@@ -37,7 +37,7 @@ public class TestBase {
         if (remoteUrl != null && !remoteUrl.isEmpty()) {
             DesiredCapabilities capabilities = new DesiredCapabilities();
 
-            boolean enableVideo = Boolean.parseBoolean(System.getProperty("enableVideo", "false"));
+            boolean enableVideo = Boolean.parseBoolean(System.getProperty("enableVideo", "true"));
             Map<String, Object> selenoidOptions = Map.<String, Object>of(
                     "enableVNC", true,
                     "enableVideo", enableVideo,
@@ -58,7 +58,7 @@ public class TestBase {
             Attach.pageSource();
             Attach.browserConsoleLogs();
 
-            if (Boolean.parseBoolean(System.getProperty("enableVideo", "false"))) {
+            if (Boolean.parseBoolean(System.getProperty("enableVideo", "true"))) {
                 Attach.addVideo();
             }
         } catch (Exception e) {
