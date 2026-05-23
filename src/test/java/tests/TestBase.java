@@ -6,9 +6,6 @@ import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
-import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import pages.RegistrationPage;
 
@@ -20,21 +17,13 @@ public class TestBase {
 
     RegistrationPage registrationPage = new RegistrationPage();
 
-    static {
-        System.out.println("=== TestBase class loaded ===");
-    }
-
     @BeforeEach
     void addListener() {
-        System.out.println("=== @BeforeEach started ===");
         SelenideLogger.addListener("AllureSelenide", new AllureSelenide());
-        System.out.println("=== @BeforeEach finished ===");
     }
 
     @BeforeAll
     static void setupSelenideConfig() {
-        System.out.println("=== @BeforeAll started ===");
-
         Configuration.browser = System.getProperty("browser", "chrome");
         Configuration.browserVersion = System.getProperty("browserVersion", "128.0");
         Configuration.browserSize = System.getProperty("browserSize", "1920x1080");
@@ -45,13 +34,7 @@ public class TestBase {
         String environment = System.getProperty("environment", "demo");
         String remoteUrl = System.getProperty("remoteUrl");
 
-        System.out.println("Environment: " + environment);
-        System.out.println("Browser: " + Configuration.browser + " " + Configuration.browserVersion);
-        System.out.println("Headless: " + Configuration.headless);
-
         if (remoteUrl != null && !remoteUrl.isEmpty()) {
-            System.out.println("Using remote WebDriver: " + remoteUrl);
-
             DesiredCapabilities capabilities = new DesiredCapabilities();
 
             boolean enableVideo = Boolean.parseBoolean(System.getProperty("enableVideo", "false"));
@@ -65,73 +48,23 @@ public class TestBase {
             capabilities.setCapability("selenoid:options", selenoidOptions);
             Configuration.browserCapabilities = capabilities;
             Configuration.remote = remoteUrl;
-        } else {
-            System.out.println("Using local WebDriver");
         }
     }
 
     @AfterEach
     void addAttachments() {
-        System.out.println("=== @AfterEach started ===");
         try {
-            System.out.println("Taking screenshot...");
             Attach.screenshotAs();
-            System.out.println("Screenshot taken");
-
-            System.out.println("Getting page source...");
             Attach.pageSource();
-            System.out.println("Page source taken");
-
-            System.out.println("Getting browser console logs...");
             Attach.browserConsoleLogs();
-            System.out.println("Browser logs taken");
 
             if (Boolean.parseBoolean(System.getProperty("enableVideo", "false"))) {
-                System.out.println("Adding video...");
                 Attach.addVideo();
-                System.out.println("Video added");
             }
         } catch (Exception e) {
             System.err.println("Error during attachment: " + e.getMessage());
-            e.printStackTrace();
         } finally {
-            System.out.println("Closing WebDriver...");
             closeWebDriver();
-            System.out.println("=== @AfterEach finished ===");
-        }
-    }
-
-    static class FailureHandler implements TestExecutionExceptionHandler {
-        @Override
-        public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
-            System.out.println("=== FailureHandler started - Test Failed! ===");
-            // Добавляем аттачи при падении теста
-            try {
-                System.out.println("Failure: Taking screenshot...");
-                Attach.screenshotAs();
-                System.out.println("Failure: Screenshot taken");
-
-                System.out.println("Failure: Getting page source...");
-                Attach.pageSource();
-                System.out.println("Failure: Page source taken");
-
-                System.out.println("Failure: Getting browser console logs...");
-                Attach.browserConsoleLogs();
-                System.out.println("Failure: Browser logs taken");
-
-                if (Boolean.parseBoolean(System.getProperty("enableVideo", "false"))) {
-                    System.out.println("Failure: Adding video...");
-                    Attach.addVideo();
-                    System.out.println("Failure: Video added");
-                }
-            } catch (Exception e) {
-                System.err.println("Error during attachment on failure: " + e.getMessage());
-                e.printStackTrace();
-            }
-
-            System.out.println("=== FailureHandler finished - Re-throwing exception ===");
-            // Пробрасываем исключение дальше
-            throw throwable;
         }
     }
 }
